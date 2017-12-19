@@ -1,0 +1,118 @@
+#set ( $uncapitalizedEntityName = ${fn.uncapitalize($entity.name)})
+##
+#set ( $argsKeysDot = "" )
+#foreach ( $key in $entity.keyAttributes )
+#if ( $foreach.count > 1 )
+#set ( $argsKeysDot = $argsKeysDot + "+'/'+${uncapitalizedEntityName}.${key.name}" )
+#else
+#set ( $argsKeysDot = $argsKeysDot + "${uncapitalizedEntityName}.${key.name}" )
+#end
+#end
+##
+#set ( $jsonWithKeyAttribs = "" )
+#foreach ( $attrib in $entity.attributes )
+#if ( $foreach.count > 1 )
+#set ( $jsonWithKeyAttribs = $jsonWithKeyAttribs + "'${attrib.name}': this.${uncapitalizedEntityName}.${attrib.name}" + ",
+                   			" )
+#else
+#set ( $jsonWithKeyAttribs = $jsonWithKeyAttribs + "'${attrib.name}': this.${uncapitalizedEntityName}.${attrib.name},
+                    		" )
+#end
+#end
+##
+<template>
+    <div class="container">
+        <div class="container">
+            <form class="form-horizontal" method="post" id="${uncapitalizedEntityName}Form" v-on:submit.prevent="save${entity.name}">
+                <div class="panel-group">
+                    <div class="panel panel-info">
+                        <div class="panel-heading">
+                            <h3>
+                                <span class="glyphicon glyphicon-leaf"></span>
+                                Create ${entity.name}
+                                <router-link to="/${uncapitalizedEntityName}" title="Back to the list">
+                                    <button type="button" class="btn btn-link pull-right">
+                                        List
+                                    </button>
+                                </router-link>
+                            </h3>
+                        </div>
+                        <div class="panel-body">
+                            <div v-bind:style="'display:'+status.display" class="panel-group">
+                                <div v-bind:class="'panel panel-'+status.bootstrapPanelColor">
+                                    <div class="panel-heading">{{ status.status }}
+                                        <div class="panel panel-body">{{ status.message }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+#foreach ( $attrib in $entity.attributes )
+                            <div class="form-group">
+                                <label class="col-sm-2">${attrib.name}#if ( $attrib.isNotNull() ) *#end</label>
+                                <div class="col-sm-8">
+#if ( $attrib.type == "Date" )
+                                    <input type="date" class="form-control"
+#else
+                                    <input type="text" class="form-control"
+#end
+                                           v-model="${uncapitalizedEntityName}.${attrib.name}" placeholder="Enter ${entity.name} ${attrib.name}" #if ( $attrib.isNotNull() )required #end>
+                                </div>
+                            </div>
+#end
+                        </div>
+                        <div class="panel-footer text-center">
+                            <a href="../../${uncapitalizedEntityName}/" title="Save the new ${uncapitalizedEntityName}">
+                                <button type="submit" formaction="../../${uncapitalizedEntityName}/" class="btn btn-success"><span class="glyphicon glyphicon-floppy-disk"></span> Save</button>
+                            </a>
+                            <div class="clearfix"></div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</template>
+
+<script>
+    import Vue from 'vue'
+    import common from '../../common.js'
+    import config from '../../../config/config.js'
+
+    export default {
+        name: '${entity.name}Create',
+        data() {
+            let router = this.${DOLLAR}router;
+			let http = this.${DOLLAR}http;
+            return new Vue({
+                el: '#[[#]]#${uncapitalizedEntityName}Create',
+                data: {
+                    ${uncapitalizedEntityName}: {},
+                    status: {
+                        status: null,
+                        message: null,
+                        display: "none",
+                        bootstrapPanelColor: null,
+                    },
+                },
+                methods: {
+                    save${entity.name}: function () {
+                        let ${uncapitalizedEntityName} = {
+                            $jsonWithKeyAttribs
+                        };
+                        http.post(config.urlApi + '/${uncapitalizedEntityName}', ${uncapitalizedEntityName}).then(response => {
+                            common.apiConnect(this, response);
+                            if (response.status === 201) {
+                                setTimeout(function () {
+                                    router.push('/${uncapitalizedEntityName}/form/'+${argsKeysDot});
+                                }, 3000);
+                            }
+                        }, response => {
+                            common.apiUnreachable(this, response);
+                        });
+                        this.status.display = "block";
+                    }
+                }
+            });
+        }
+    }
+</script>

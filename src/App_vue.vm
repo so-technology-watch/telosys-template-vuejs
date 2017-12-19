@@ -1,0 +1,28 @@
+<template>
+    <div id="app">
+        <!-- Navigation Bar -->
+        <nav class="navbar navbar-inverse">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <div class="navbar-brand">
+                        <router-link to="/">
+                            <span class="glyphicon glyphicon-home"></span> Home
+                        </router-link>
+                    </div>
+                </div>
+                <ul class="nav navbar-nav">
+#foreach( $entity in $selectedEntities )
+					<li id="li${foreach.count}"><router-link to="/${fn.uncapitalize($entity.name)}">${entity.name}</router-link></li>
+#end
+                </ul>
+            </div>
+        </nav>
+        <router-view></router-view>
+    </div>
+</template>
+
+<script>
+    export default {
+        name: 'app'
+    }
+</script>

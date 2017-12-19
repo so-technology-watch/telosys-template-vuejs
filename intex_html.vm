@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- Load Bootstrap CSS & Custom style -->
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" type="text/css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/styles.css">
+
+    <!-- Load JQuery & Boostrap JS -->
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <meta charset="UTF-8">
+    <title>HTML5 VueJS</title>
+</head>
+<body>
+<!-- main application -->
+<div id="app"></div>
+#foreach ($entity in $selectedEntities)
+<div id="${fn.uncapitalize($entity.name)}Panel"></div>
+<div id="${fn.uncapitalize($entity.name)}Update"></div>
+<div id="${fn.uncapitalize($entity.name)}Create"></div>
+#end
+<!-- built files will be auto injected -->
+</body>
+</html>
